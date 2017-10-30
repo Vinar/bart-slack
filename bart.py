@@ -10,7 +10,8 @@ app = Flask(__name__)
 @app.route('/')
 def main():
 
-    station = 'CIVC'
+    # TODO : pass in parameter from URL
+    station = 'MLBR'
 
     message = bart_status.getStatus(station)
 
