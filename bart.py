@@ -1,30 +1,22 @@
-import os
-import requests
-import json
-import time
+import bart_status
+import bart_realTimeDepartures
+import constants
 
 from flask import Flask
-
 
 app = Flask(__name__)
 
 
 @app.route('/')
-def status():
+def main():
 
-    API_ENDPOINT = 'http://api.bart.gov/api/bsa.aspx'
-    params = {'cmd': 'bsa', 'json': 'y', 'key': 'QBZ4-Z5SG-QRBY-YIDD'}
-    response = requests.get(API_ENDPOINT, params=params)
+    station = 'CIVC'
 
-    # displayMessage = "Welcome to Bart-Slack app !!"
-    # displayMessage += "\n\n******************"
-    # displayMessage += "\n\n******************"
-    # displayMessage += "\n\nReruest URL : " + str(response.url)
-    # displayMessage += "\n\nStatus : " + str(response.status_code)
+    message = bart_status.getStatus(station)
 
-    json_response = json.loads(response.text)
-    bartMessage = json_response['root']['bsa'][0]['description']['#cdata-section']
-    currentDateTime = time.strftime('%Y-%m-%d %H:%M:%S')
-    displayMessage = "Current Status as of " + currentDateTime + "  ==>  " + str(bartMessage)
+    errorMessageCondition = (constants.NOT_A_VALID_STATION is message)
 
-    return displayMessage
+    if (station != '' and (not errorMessageCondition)):
+        message += bart_realTimeDepartures.getRealTimeDepartures(station)
+
+    return message
